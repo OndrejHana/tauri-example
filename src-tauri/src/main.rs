@@ -7,7 +7,12 @@ use tauri::{AppHandle, WindowBuilder, WindowUrl};
 #[tauri::command]
 fn spawn_window(app_handle: AppHandle) {
     println!("Spawning window");
-    let handle = WindowBuilder::new(&app_handle, "welcome", WindowUrl::default()).build().unwrap();
+    let handle = std::thread::spawn(move || {
+        let handle = WindowBuilder::new(&app_handle, "welcome", WindowUrl::default())
+            .build()
+            .unwrap();
+    });
+    let _ = handle.join();
 }
 
 fn main() {
@@ -16,7 +21,11 @@ fn main() {
             println!("Page loaded on");
         })
         .on_window_event(|event| {
-            println!("Window event, {} {:?}", event.window().label() ,event.event());
+            println!(
+                "Window event, {} {:?}",
+                event.window().label(),
+                event.event()
+            );
         })
         .invoke_handler(tauri::generate_handler![spawn_window])
         .run(tauri::generate_context!())
