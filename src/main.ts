@@ -9,9 +9,9 @@ window.addEventListener("DOMContentLoaded", () => {
   document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
     
-    const data = greetInputEl?.value;
-    if (data && greetMsgEl) {
-      invoke("spawn_window", { data });
+    const msg = greetInputEl?.value;
+    if (msg && greetMsgEl) {
+      invoke("spawn_window", { msg });
     }
   });
 });
