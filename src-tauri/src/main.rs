@@ -1,16 +1,25 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{AppHandle, WindowBuilder, WindowUrl};
+use tauri::{AppHandle, Manager, WindowBuilder, WindowEvent, WindowUrl};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn spawn_window(app_handle: AppHandle) {
+fn spawn_window(app_handle: AppHandle, data: String) {
     println!("Spawning window");
     let handle = std::thread::spawn(move || {
-        let handle = WindowBuilder::new(&app_handle, "welcome", WindowUrl::default())
-            .build()
-            .unwrap();
+        let window = WindowBuilder::new(
+            &app_handle,
+            "dynamicWindow",
+            WindowUrl::App("dynamicWindow.html".into()),
+        )
+        .build()
+        .unwrap();
+
+        let event_window = window.clone();
+        window.listen("window-ready", move |event| {
+            event_window.emit("greet-msg", &data);
+        });
     });
     let _ = handle.join();
 }
