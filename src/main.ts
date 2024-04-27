@@ -8,6 +8,10 @@ window.addEventListener("DOMContentLoaded", () => {
   greetMsgEl = document.querySelector("#greet-msg");
   document.querySelector("#greet-form")?.addEventListener("submit", (e) => {
     e.preventDefault();
-    invoke("spawn_window");
+    
+    const data = greetInputEl?.value;
+    if (data && greetMsgEl) {
+      invoke("spawn_window", { data });
+    }
   });
 });

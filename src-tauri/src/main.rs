@@ -5,12 +5,16 @@ use tauri::{AppHandle, WindowBuilder, WindowUrl};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
-fn spawn_window(app_handle: AppHandle) {
-    println!("Spawning window");
+fn spawn_window(app_handle: AppHandle, data: String) {
     let handle = std::thread::spawn(move || {
-        let handle = WindowBuilder::new(&app_handle, "welcome", WindowUrl::default())
-            .build()
-            .unwrap();
+        let handle = WindowBuilder::new(
+            &app_handle,
+            "dynamicWindow",
+            WindowUrl::App("dynamicWindow.html".into()),
+        )
+        .initialization_script(&format!(r#"localStorage.setItem("greetMsg", "{}");"#, &data))
+        .build()
+        .unwrap();
     });
     let _ = handle.join();
 }
