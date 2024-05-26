@@ -20,10 +20,23 @@
     },
     "windows": [
       {
-        "title": "tauri-app",
+        "title": "main",
         "width": 800,
-        "height": 600
-      }
+        "height": 600,
+        "visible": false
+      },
+      {
+        "url": "loading.html",
+        "title": "loading-screen",
+        "label": "loading-screen",
+        "width": 400,
+        "height": 400,
+        "center": true,
+        "decorations": false,
+        "resizable": false,
+        "visible": true
+    }
+
     ],
     "security": {
       "csp": null

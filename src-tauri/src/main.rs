@@ -1,33 +1,34 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use tauri::{AppHandle, WindowBuilder, WindowUrl};
+use std::{thread::{sleep, spawn}, time::Duration};
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn spawn_window(app_handle: AppHandle) {
-    println!("Spawning window");
-    let handle = std::thread::spawn(move || {
-        let handle = WindowBuilder::new(&app_handle, "welcome", WindowUrl::default())
-            .build()
-            .unwrap();
-    });
-    let _ = handle.join();
+use tauri::{AppHandle, Manager};
+
+
+fn expensive_operation() -> String {
+    sleep(Duration::from_millis(5000));
+    "got it".to_string()
+}
+
+fn close_splashscreen(app: AppHandle) {
+    app.get_window("main").unwrap().show().unwrap();
+    app.get_window("loading-screen").unwrap().hide().unwrap();
 }
 
 fn main() {
     tauri::Builder::default()
-        .on_page_load(|window, _payload| {
-            println!("Page loaded on");
+        .setup(|app|{ 
+
+            let handle = app.handle();
+            let _ = spawn(move || {
+                expensive_operation();
+                close_splashscreen(handle);
+            });
+
+            Ok(())
         })
-        .on_window_event(|event| {
-            println!(
-                "Window event, {} {:?}",
-                event.window().label(),
-                event.event()
-            );
-        })
-        .invoke_handler(tauri::generate_handler![spawn_window])
+        .invoke_handler(tauri::generate_handler![])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
